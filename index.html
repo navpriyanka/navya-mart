@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#ffffff">
+<meta name="description" content="NAVYA MART - Fashion, home, beauty and everyday shopping.">
+<title>NAVYA MART | हर ज़रूरत की शॉपिंग</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="topbar wrap">
+    <a class="brand" href="#home" aria-label="NAVYA MART home"><span class="brand-mark">N</span><span>NAVYA <b>MART</b><small>SMART SHOPPING, HAPPY LIVING</small></span></a>
+    <div class="top-actions"><a class="app-download" href="#download-app" aria-label="Download app">↓ <span>Download App</span></a><button class="text-action" aria-label="Wishlist" id="wishlistBtn">♡</button><button class="cart-action" id="cartButton" aria-label="Open cart">🛒 <span>Cart</span><b id="count">0</b></button></div>
+  </div>
+  <div class="search-row wrap"><label class="searchbox"><span>⌕</span><input id="search" placeholder="Search by keyword or product name" aria-label="Search products"><button aria-label="Search">⌕</button></label></div>
+  <div class="delivery-strip"><div class="wrap delivery-inner"><span>📍</span><span>Delivering to <b>Keolari – 480991</b></span><span class="chevron">›</span></div></div>
+  <nav class="quick-cats" id="quickCats" aria-label="Shopping categories"></nav>
+</header>
+<main id="home" class="wrap main-content">
+  <section class="hero"><div class="hero-copy"><span class="eyebrow">✨ YOUR EVERYDAY SHOPPING DESTINATION</span><h1>हर पसंद की शॉपिंग,<br><em>एक ही जगह!</em></h1><p>Fashion, Home, Beauty और रोज़मर्रा की ज़रूरतों के लिए शानदार पसंद।</p><a class="hero-cta" href="#catalog">अभी खरीदारी करें <span>→</span></a></div><div class="hero-art"><div class="hero-circle"></div><div class="bag bag-one">N</div><div class="bag bag-two">♡</div><span class="sparkle s1">✦</span><span class="sparkle s2">✧</span></div></section>
+  <section class="category-section"><div class="section-title"><div><span class="section-kicker">EXPLORE MORE</span><h2>आपके लिए कैटेगरी</h2></div><a href="#catalog" class="see-all">सभी देखें →</a></div><div class="category-rail" id="categories"></div></section>
+  <section class="app-promo" id="download-app"><div class="app-promo-icon">📱</div><div class="app-promo-copy"><b>NAVYA MART App</b><span>जल्द आ रहा है — ऐप से शॉपिंग का आसान अनुभव</span></div><button type="button" class="app-promo-btn" disabled aria-disabled="true" title="App अभी उपलब्ध नहीं है">Download App <small>Coming soon</small></button></section>
+  <section class="benefit-strip"><div>🚚 <span><b>Convenient Delivery</b><small>आपके पते तक</small></span></div><div>💵 <span><b>Cash on Delivery</b><small>अभी उपलब्ध</small></span></div><div>🔒 <span><b>Secure Shopping</b><small>आसान ऑर्डर प्रक्रिया</small></span></div></section>
+  <section class="product-section" id="catalog"><div class="section-title"><div><span class="section-kicker">HANDPICKED FOR YOU</span><h2 id="heading">Trending Products <span>✦</span></h2></div><a href="#catalog" id="clearFilter" class="see-all">View all →</a></div><div class="product-grid" id="products"></div></section>
+  <section class="promo-band"><div><span>✨ NAVYA MART PICKS</span><h2>अच्छी पसंद, शानदार कीमत</h2><p>हर दिन कुछ नया खोजें।</p></div><div class="promo-icon">🛍️</div></section>
+  <section class="product-section"><div class="section-title"><div><span class="section-kicker">JUST ARRIVED</span><h2>New Arrivals</h2></div></div><div class="product-grid" id="newArrivals"></div></section>
+</main>
+<footer><div class="wrap footer-inner"><div class="brand footer-brand"><span class="brand-mark">N</span><span>NAVYA <b>MART</b><small>SMART SHOPPING, HAPPY LIVING</small></span></div><p>आपकी पसंद, हमारी प्राथमिकता।</p><small>© NAVYA MART · Frontend Demo</small><p class="disclaimer">यह अभी डेमो वेबसाइट है। वास्तविक ऑर्डर, भुगतान और डिलीवरी सुविधा Backend जुड़ने के बाद चालू होगी।</p></div></footer>
+<nav class="bottom-nav" aria-label="Main navigation"><a class="active" href="#home"><span>⌂</span>Home</a><a href="#categories"><span>▦</span>Categories</a><a href="#catalog"><span>♡</span>Wishlist</a><button id="bottomCart"><span>▢</span>Cart <i id="bottomCount">0</i></button><a href="#account" id="accountLink"><span>♙</span>Account</a></nav>
+<div class="overlay" id="overlay"><section class="drawer" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="drawer-head"><h2 id="modalTitle">आपका Cart</h2><button class="close" id="close">✕</button></div><div id="cartView"></div><div id="checkoutView" class="hidden"><form id="orderForm" class="checkout-form"><label>पूरा नाम<input required name="name" autocomplete="name" placeholder="अपना नाम लिखें"></label><label>मोबाइल नंबर<input required name="phone" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" placeholder="10 अंकों का मोबाइल नंबर"></label><label>पिन कोड<input required name="pin" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="PIN code"></label><label>पूरा पता<textarea required name="address" rows="3" placeholder="मकान, गाँव, तहसील, जिला"></textarea></label><div class="pay-option selected">● <b>Cash on Delivery</b><small>डिलीवरी के समय भुगतान करें</small></div><div class="pay-option locked">🔒 <b>Online Payment</b><small>जल्द उपलब्ध होगा · अभी लॉक है</small></div><p class="demo-note">यह डेमो है। अभी ऑर्डर सर्वर पर सेव नहीं होगा।</p><button class="checkout-btn" type="submit">ऑर्डर की समीक्षा करें</button></form></div><div id="preview" class="hidden"></div></section></div>
+<script src="assets/js/app.js" defer></script>
+</body></html>
