@@ -22,3 +22,31 @@
 .app-promo-copy{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}.app-promo-copy b{font-size:14px;color:var(--purple)}.app-promo-copy span{font-size:11px;color:var(--muted)}
 .app-promo-btn{border:0;border-radius:11px;background:#e9e3ed;color:#777080;padding:8px 11px;font-size:11px;font-weight:850;white-space:nowrap;cursor:not-allowed}.app-promo-btn small{display:block;font-size:8px;font-weight:600;margin-top:2px}
 @media(max-width:480px){.top-actions{gap:7px}.app-download{padding:7px 8px;font-size:10px}.app-download span{display:inline}.text-action{font-size:25px}.cart-action{padding:8px 9px}.cart-action span{display:none}.app-promo{gap:9px;padding:11px}.app-promo-copy span{font-size:10px}.app-promo-btn{padding:7px 8px;font-size:10px}}
+
+/* NAVYA MART: final home-page refinement */
+:root{--bg:#faf9fc}
+.site-header{box-shadow:0 4px 22px #28143c10}
+.searchbox:focus-within{border-color:#b78bd8;box-shadow:0 0 0 3px #6728a812}
+.hero{box-shadow:0 14px 34px #54229b20}
+.hero-cta{box-shadow:0 5px 14px #30104c25;transition:transform .18s ease,box-shadow .18s ease}
+.hero-cta:hover{transform:translateY(-2px);box-shadow:0 8px 18px #30104c30}
+.category-card{transition:border-color .18s ease,transform .18s ease,box-shadow .18s ease}
+.category-card:hover{transform:translateY(-2px);box-shadow:0 7px 18px #2b164012}
+.product-card:hover{box-shadow:0 9px 24px #2c173b12}
+.product-image img{transition:transform .25s ease}
+.product-card:hover .product-image img{transform:scale(1.035)}
+.add-btn:hover{background:#f7f0fc}
+.benefit-strip>div{min-width:0}
+@media(max-width:700px){
+  .hero{min-height:226px}
+  .hero-copy{max-width:68%}
+  .hero h1{font-size:clamp(24px,6vw,29px)}
+  .hero p{line-height:1.55}
+  .hero-art{opacity:.94}
+  .benefit-strip>div{align-items:flex-start;justify-content:flex-start;min-height:62px}
+  .product-image{height:clamp(145px,48vw,190px)}
+  .product-card{border-radius:13px}
+  .section-title{gap:10px}
+  .section-title h2{line-height:1.25}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
