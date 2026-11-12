@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NAVYA MART | Admin</title>
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand"><div class="brand-mark">N</div><div><strong>NAVYA MART</strong><small>ADMIN PANEL</small></div></div>
+      <nav class="nav">
+        <button class="nav-link active" data-page="dashboard">▦ <span>Dashboard</span></button>
+        <button class="nav-link" data-page="products">▣ <span>Products</span></button>
+        <button class="nav-link" data-page="categories">▤ <span>Categories</span></button>
+        <button class="nav-link" data-page="orders">▧ <span>Orders</span></button>
+        <button class="nav-link" data-page="customers">♙ <span>Customers</span></button>
+        <button class="nav-link" data-page="payments">₹ <span>Payments</span></button>
+        <button class="nav-link" data-page="settings">⚙ <span>Website Settings</span></button>
+      </nav>
+      <div class="sidebar-bottom"><span class="status-dot"></span> Backend not connected</div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
+        <div><div class="eyebrow">NAVYA MART / ADMIN</div><h1 id="pageTitle">Dashboard</h1></div>
+        <div class="top-actions"><span class="admin-chip">Admin Preview</span><div class="avatar">A</div></div>
+      </header>
+
+      <section class="notice"><strong>Preview mode:</strong> यह Admin Panel अभी frontend है। Login, database, product saving और order management के लिए Cloudflare Worker + D1 API जोड़ना बाकी है।</section>
+
+      <section class="page active" id="page-dashboard">
+        <div class="welcome"><div><h2>Welcome to NAVYA MART</h2><p>आपके ऑनलाइन स्टोर का कंट्रोल सेंटर</p></div><span class="date-pill" id="todayDate"></span></div>
+        <div class="stats-grid">
+          <article class="stat-card"><span class="stat-icon purple">▣</span><div class="stat-label">Total Products</div><strong>—</strong><small>डेटाबेस कनेक्शन बाकी</small></article>
+          <article class="stat-card"><span class="stat-icon orange">▧</span><div class="stat-label">Total Orders</div><strong>—</strong><small>डेटाबेस कनेक्शन बाकी</small></article>
+          <article class="stat-card"><span class="stat-icon blue">♙</span><div class="stat-label">Customers</div><strong>—</strong><small>डेटाबेस कनेक्शन बाकी</small></article>
+          <article class="stat-card"><span class="stat-icon green">₹</span><div class="stat-label">Total Sales</div><strong>—</strong><small>डेटाबेस कनेक्शन बाकी</small></article>
+        </div>
+        <div class="content-grid">
+          <article class="panel"><div class="panel-head"><div><h3>Recent Orders</h3><p>नए ऑर्डर यहाँ दिखाई देंगे</p></div><button class="text-btn" data-go="orders">View all →</button></div><div class="empty-state"><div class="empty-icon">▧</div><strong>अभी कोई ऑर्डर उपलब्ध नहीं</strong><p>Cloudflare D1 कनेक्ट होने के बाद ऑर्डर यहाँ दिखेंगे।</p></div></article>
+          <article class="panel"><div class="panel-head"><div><h3>Quick Actions</h3><p>आम काम जल्दी शुरू करें</p></div></div><div class="quick-actions"><button data-go="products"><b>＋</b><span><strong>Add Product</strong><small>नया प्रोडक्ट जोड़ें</small></span></button><button data-go="categories"><b>▤</b><span><strong>Manage Categories</strong><small>कैटेगरी व्यवस्थित करें</small></span></button><button data-go="orders"><b>▧</b><span><strong>View Orders</strong><small>ग्राहक के ऑर्डर देखें</small></span></button></div></article>
+        </div>
+      </section>
+
+      <section class="page" id="page-products">
+        <div class="section-head"><div><h2>Products</h2><p>स्टोर के प्रोडक्ट और उनकी कीमतें मैनेज करें।</p></div><button class="primary-btn" id="addProductBtn">＋ Add Product</button></div>
+        <div class="toolbar"><input id="productSearch" placeholder="Search product name or SKU..."><select id="productFilter"><option value="all">All products</option><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+        <div class="panel table-wrap"><table><thead><tr><th>Product</th><th>SKU</th><th>Selling Price</th><th>Purchase Cost</th><th>Stock</th><th>Status</th><th>Action</th></tr></thead><tbody id="productRows"><tr><td colspan="7" class="table-empty">अभी कोई प्रोडक्ट सेव नहीं है। Backend कनेक्शन के बाद यहाँ प्रोडक्ट आएँगे।</td></tr></tbody></table></div>
+        <p class="helper">Purchase Cost केवल Admin के लिए है। इसे ग्राहक वाली वेबसाइट/API में कभी न भेजें।</p>
+      </section>
+
+      <section class="page" id="page-categories">
+        <div class="section-head"><div><h2>Categories</h2><p>जैसे Women, Men, Kids, Home और Beauty।</p></div><button class="primary-btn" id="addCategoryBtn">＋ Add Category</button></div>
+        <div class="panel table-wrap"><table><thead><tr><th>Category Name</th><th>Slug</th><th>Status</th><th>Action</th></tr></thead><tbody id="categoryRows"><tr><td colspan="4" class="table-empty">अभी कोई कैटेगरी उपलब्ध नहीं है।</td></tr></tbody></table></div>
+      </section>
+
+      <section class="page" id="page-orders">
+        <div class="section-head"><div><h2>Orders</h2><p>ग्राहक के ऑर्डर और डिलीवरी स्टेटस।</p></div><button class="secondary-btn" id="exportOrdersBtn">↓ Export CSV</button></div>
+        <div class="toolbar"><input id="orderSearch" placeholder="Search order number or mobile..."><select id="orderStatusFilter"><option value="all">All statuses</option><option>New</option><option>Confirmed</option><option>Shipped</option><option>Delivered</option><option>Cancelled</option><option>Returned</option></select></div>
+        <div class="panel table-wrap"><table><thead><tr><th>Order No.</th><th>Customer</th><th>Mobile</th><th>Amount</th><th>Date</th><th>Status</th><th>Action</th></tr></thead><tbody id="orderRows"><tr><td colspan="7" class="table-empty">अभी कोई ऑर्डर उपलब्ध नहीं है।</td></tr></tbody></table></div>
+      </section>
+
+      <section class="page" id="page-customers">
+        <div class="section-head"><div><h2>Customers</h2><p>ग्राहकों की संपर्क जानकारी।</p></div></div>
+        <div class="toolbar"><input id="customerSearch" placeholder="Search customer name or mobile..."></div>
+        <div class="panel table-wrap"><table><thead><tr><th>Name</th><th>Mobile</th><th>Orders</th><th>Joined</th></tr></thead><tbody id="customerRows"><tr><td colspan="4" class="table-empty">अभी कोई ग्राहक उपलब्ध नहीं है।</td></tr></tbody></table></div>
+      </section>
+
+      <section class="page" id="page-payments">
+        <div class="section-head"><div><h2>Payments</h2><p>भुगतान की स्थिति और ट्रांजैक्शन रिकॉर्ड।</p></div></div>
+        <div class="panel table-wrap"><table><thead><tr><th>Transaction ID</th><th>Order</th><th>Method</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody id="paymentRows"><tr><td colspan="6" class="table-empty">अभी कोई पेमेंट रिकॉर्ड उपलब्ध नहीं है।</td></tr></tbody></table></div>
+      </section>
+
+      <section class="page" id="page-settings">
+        <div class="section-head"><div><h2>Website Settings</h2><p>स्टोर की बुनियादी जानकारी और संपर्क विवरण।</p></div><button class="primary-btn" id="saveSettingsBtn">Save Settings</button></div>
+        <div class="panel settings-form">
+          <label>Store Name<input id="storeName" value="NAVYA MART"></label>
+          <label>Contact Mobile<input id="storeMobile" placeholder="Store contact number"></label>
+          <label>Support Email<input id="storeEmail" type="email" placeholder="Support email"></label>
+          <label>Store Tagline<input id="storeTagline" value="Shopping made simple"></label>
+          <p class="helper">अभी ये सेटिंग केवल इस ब्राउज़र के preview में रहती हैं। D1 API कनेक्शन के बाद स्थायी रूप से सेव होंगी।</p>
+        </div>
+      </section>
+      <footer>© <span id="year"></span> NAVYA MART · Admin Panel</footer>
+    </main>
+  </div>
+
+  <dialog id="simpleDialog"><form method="dialog" class="dialog-card"><button class="dialog-close" aria-label="Close">×</button><h3 id="dialogTitle">Add</h3><div id="dialogBody"></div><div class="dialog-actions"><button class="secondary-btn" value="cancel">Cancel</button><button class="primary-btn" id="dialogSave" value="default">Continue</button></div></form></dialog>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="assets/js/admin.js"></script>
+  <script src="assets/js/dashboard.js"></script>
+  <script src="assets/js/products.js"></script>
+  <script src="assets/js/orders.js"></script>
+  <script src="assets/js/customers.js"></script>
+</body>
+</html>
