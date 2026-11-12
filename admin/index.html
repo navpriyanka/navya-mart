@@ -58,9 +58,11 @@
       </section>
 
       <section class="page" id="page-orders">
-        <div class="section-head"><div><h2>Orders</h2><p>ग्राहक के ऑर्डर और डिलीवरी स्टेटस।</p></div><button class="secondary-btn" id="exportOrdersBtn">↓ Export CSV</button></div>
-        <div class="toolbar"><input id="orderSearch" placeholder="Search order number or mobile..."><select id="orderStatusFilter"><option value="all">All statuses</option><option>New</option><option>Confirmed</option><option>Shipped</option><option>Delivered</option><option>Cancelled</option><option>Returned</option></select></div>
-        <div class="panel table-wrap"><table><thead><tr><th>Order No.</th><th>Customer</th><th>Mobile</th><th>Amount</th><th>Date</th><th>Status</th><th>Action</th></tr></thead><tbody id="orderRows"><tr><td colspan="7" class="table-empty">अभी कोई ऑर्डर उपलब्ध नहीं है।</td></tr></tbody></table></div>
+        <div class="section-head"><div><h2>Orders</h2><p>COD ऑर्डर, ग्राहक की जानकारी और भुगतान संग्रह की स्थिति।</p></div><button class="secondary-btn" id="exportOrdersBtn">↓ Export CSV</button></div>
+        <div class="cod-note"><strong>COD workflow:</strong> ग्राहक से डिलीवरी के समय भुगतान लिया जाएगा। डिलीवरी और राशि प्राप्त होने की पुष्टि के बाद Payment Status को <b>Collected</b> करें।</div>
+        <div class="toolbar"><input id="orderSearch" placeholder="Search order number, customer or mobile..."><select id="orderStatusFilter"><option value="all">All order statuses</option><option>New</option><option>Confirmed</option><option>Shipped</option><option>Delivered</option><option>Cancelled</option><option>Returned</option></select><select id="paymentStatusFilter"><option value="all">All payment statuses</option><option>Pending</option><option>Collected</option></select></div>
+        <div class="panel table-wrap"><table><thead><tr><th>Order No.</th><th>Customer</th><th>Mobile</th><th>Order Amount</th><th>Payment</th><th>Payment Status</th><th>Order Status</th><th>Details</th></tr></thead><tbody id="orderRows"><tr><td colspan="8" class="table-empty">अभी कोई ऑर्डर उपलब्ध नहीं है। ग्राहक का ऑर्डर आने पर उसकी जानकारी यहाँ दिखाई देगी।</td></tr></tbody></table></div>
+        <div class="panel order-help"><h3>Order Details में ये Copy विकल्प रहेंगे</h3><div class="copy-preview"><span>Customer Name</span><span>Mobile Number</span><span>PIN Code</span><span>Full Address</span><span>Complete Order</span><span>COD Amount</span></div><p class="helper">ये बटन वास्तविक ऑर्डर डेटा आने पर काम करेंगे। अभी Cloudflare Worker और D1 API कनेक्ट नहीं हैं, इसलिए कोई नकली ग्राहक या ऑर्डर डेटा नहीं दिखाया जा रहा है।</p></div>
       </section>
 
       <section class="page" id="page-customers">
@@ -88,7 +90,7 @@
     </main>
   </div>
 
-  <dialog id="simpleDialog"><form method="dialog" class="dialog-card"><button class="dialog-close" aria-label="Close">×</button><h3 id="dialogTitle">Add</h3><div id="dialogBody"></div><div class="dialog-actions"><button class="secondary-btn" value="cancel">Cancel</button><button class="primary-btn" id="dialogSave" value="default">Continue</button></div></form></dialog>
+  <dialog id="orderDetailsDialog"><div class="dialog-card order-detail-card"><button class="dialog-close" id="closeOrderDetails" aria-label="Close">×</button><h3>Order Details</h3><p class="helper">यहाँ वास्तविक ग्राहक और COD जानकारी API कनेक्शन के बाद दिखाई देगी।</p><div id="orderDetailsBody"></div><div class="dialog-actions"><button class="secondary-btn" id="closeOrderDetailsBottom">Close</button></div></div></dialog>\n  <dialog id="simpleDialog"><form method="dialog" class="dialog-card"><button class="dialog-close" aria-label="Close">×</button><h3 id="dialogTitle">Add</h3><div id="dialogBody"></div><div class="dialog-actions"><button class="secondary-btn" value="cancel">Cancel</button><button class="primary-btn" id="dialogSave" value="default">Continue</button></div></form></dialog>
   <div class="toast" id="toast" role="status"></div>
   <script src="assets/js/admin.js"></script>
   <script src="assets/js/dashboard.js"></script>
