@@ -1,3 +1,5 @@
+const API_BASE = "https://navya-mart-api.psahu154.workers.dev";
+
 const categories = [
   {name:'Women',icon:'👗',image:'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=300&q=75'},
   {name:'Men',icon:'👔',image:'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=300&q=75'},
@@ -20,6 +22,7 @@ const products = [
 ];
 let filter='All Products', cart={};
 const $=id=>document.getElementById(id), money=n=>'₹'+n.toLocaleString('en-IN');
+
 function renderCategories(){
  const tiles=categories.map(c=>`<button class="category-card" data-cat="${c.name}"><img class="cat-photo" src="${c.image}" alt="${c.name}" loading="lazy" onerror="this.style.display='none'"><span class="cat-fallback">${c.icon}</span><span>${c.name}</span></button>`).join('');
  $('categories').innerHTML=tiles;
@@ -33,7 +36,100 @@ function updateCount(){const n=Object.values(cart).reduce((a,b)=>a+b,0);$('count
 function total(){return products.reduce((s,p)=>s+p.price*(cart[p.id]||0),0)}
 function renderCart(){const items=products.filter(p=>cart[p.id]);$('cartView').innerHTML=items.length?items.map(p=>`<div class="cart-row"><span>${p.name}<br><b>${money(p.price)}</b></span><span class="qty"><button data-qty="${p.id}" data-step="-1">−</button> ${cart[p.id]} <button data-qty="${p.id}" data-step="1">+</button></span></div>`).join('')+`<div class="cart-total"><span>Total</span><b>${money(total())}</b></div><p class="free-cod-note">✓ Free COD · कोई अतिरिक्त COD शुल्क नहीं</p><button class="checkout-btn" id="checkoutBtn">Proceed to Checkout</button>`:'<div class="empty">आपका Cart अभी खाली है।<br>अपनी पसंद के प्रोडक्ट जोड़ें।</div>';if($('checkoutBtn'))$('checkoutBtn').onclick=()=>{$('cartView').classList.add('hidden');$('checkoutView').classList.remove('hidden');$('modalTitle').textContent='Checkout · COD'};}
 function openCart(){$('overlay').classList.add('show');$('cartView').classList.remove('hidden');$('checkoutView').classList.add('hidden');$('preview').classList.add('hidden');$('modalTitle').textContent='आपका Cart';renderCart()}
-document.addEventListener('click',e=>{const cat=e.target.closest('[data-cat]');if(cat){filter=cat.dataset.cat;renderCategories();renderProducts();$('catalog').scrollIntoView({behavior:'smooth'});return}const add=e.target.closest('[data-add]');if(add){const id=add.dataset.add;cart[id]=(cart[id]||0)+1;updateCount();add.textContent='✓ Added';return}const qty=e.target.closest('[data-qty]');if(qty){cart[qty.dataset.qty]+=Number(qty.dataset.step);if(cart[qty.dataset.qty]<=0)delete cart[qty.dataset.qty];updateCount();renderCart();return}const wish=e.target.closest('[data-wish]');if(wish){wish.classList.toggle('is-wished');wish.textContent=wish.classList.contains('is-wished')?'♥':'♡'}});
-$('cartButton').onclick=openCart;$('bottomCart').onclick=openCart;$('close').onclick=()=>$('overlay').classList.remove('show');$('overlay').onclick=e=>{if(e.target===$('overlay'))$('overlay').classList.remove('show')};$('search').oninput=renderProducts;$('clearFilter').onclick=e=>{e.preventDefault();filter='All Products';$('search').value='';renderCategories();renderProducts()};$('wishlistBtn').onclick=()=>alert('Wishlist में जोड़ने के लिए किसी प्रोडक्ट पर ♡ दबाएँ।');
-$('orderForm').onsubmit=e=>{e.preventDefault();const d=new FormData(e.target);$('checkoutView').classList.add('hidden');$('preview').classList.remove('hidden');$('modalTitle').textContent='Order Preview';$('preview').innerHTML=`<p class="success">✓ Demo order preview तैयार है। अभी वास्तविक ऑर्डर नहीं हुआ है।</p><p><b>नाम:</b> ${d.get('name')}</p><p><b>मोबाइल:</b> ${d.get('phone')}</p><p><b>पिन कोड:</b> ${d.get('pin')}</p><p><b>पता:</b> ${d.get('address')}</p><p><b>कुल:</b> ${money(total())} · Free COD (कोई अतिरिक्त शुल्क नहीं)</p>`};
-renderCategories();renderProducts();renderNew();
+
+document.addEventListener('click',e=>{
+ const cat=e.target.closest('[data-cat]');
+ if(cat){filter=cat.dataset.cat;renderCategories();renderProducts();$('catalog').scrollIntoView({behavior:'smooth'});return}
+ const add=e.target.closest('[data-add]');
+ if(add){const id=add.dataset.add;cart[id]=(cart[id]||0)+1;updateCount();add.textContent='✓ Added';return}
+ const qty=e.target.closest('[data-qty]');
+ if(qty){cart[qty.dataset.qty]+=Number(qty.dataset.step);if(cart[qty.dataset.qty]<=0)delete cart[qty.dataset.qty];updateCount();renderCart();return}
+ const wish=e.target.closest('[data-wish]');
+ if(wish){wish.classList.toggle('is-wished');wish.textContent=wish.classList.contains('is-wished')?'♥':'♡'}
+});
+
+$('cartButton').onclick=openCart;
+$('bottomCart').onclick=openCart;
+$('close').onclick=()=>$('overlay').classList.remove('show');
+$('overlay').onclick=e=>{if(e.target===$('overlay'))$('overlay').classList.remove('show')};
+$('search').oninput=renderProducts;
+$('clearFilter').onclick=e=>{e.preventDefault();filter='All Products';$('search').value='';renderCategories();renderProducts()};
+$('wishlistBtn').onclick=()=>alert('Wishlist में जोड़ने के लिए किसी प्रोडक्ट पर ♡ दबाएँ।');
+
+// Real COD checkout: show success only after the Worker confirms the order was saved.
+$('orderForm').onsubmit = async e => {
+  e.preventDefault();
+
+  const form = e.currentTarget;
+  const submitButton = form.querySelector('button[type="submit"]');
+  const data = new FormData(form);
+  const items = products
+    .filter(p => Number(cart[p.id] || 0) > 0)
+    .map(p => ({ id: p.id, quantity: Number(cart[p.id]) }));
+
+  if (!items.length) {
+    alert('आपका Cart खाली है। पहले कोई Product जोड़ें।');
+    return;
+  }
+
+  const payload = {
+    name: String(data.get('name') || '').trim(),
+    phone: String(data.get('phone') || '').trim(),
+    pin: String(data.get('pin') || '').trim(),
+    address: String(data.get('address') || '').trim(),
+    items
+  };
+
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.textContent = 'ऑर्डर सेव हो रहा है...';
+  }
+
+  try {
+    const response = await fetch(`${API_BASE}/api/orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.ok) {
+      throw new Error(result.error || 'ऑर्डर सेव नहीं हो सका।');
+    }
+
+    $('checkoutView').classList.add('hidden');
+    $('preview').classList.remove('hidden');
+    $('modalTitle').textContent = 'Order Confirmed';
+    $('preview').innerHTML = `
+      <p class="success">✓ आपका COD ऑर्डर सफलतापूर्वक दर्ज हो गया है।</p>
+      <p><b>Order Number:</b> ${result.orderNumber}</p>
+      <p><b>नाम:</b> ${escapeHTML(payload.name)}</p>
+      <p><b>मोबाइल:</b> ${escapeHTML(payload.phone)}</p>
+      <p><b>पिन कोड:</b> ${escapeHTML(payload.pin)}</p>
+      <p><b>पता:</b> ${escapeHTML(payload.address)}</p>
+      <p><b>कुल:</b> ${money(result.totalAmount)} · Free COD (कोई अतिरिक्त शुल्क नहीं)</p>
+      <p>भुगतान डिलीवरी के समय करें।</p>
+    `;
+
+    cart = {};
+    updateCount();
+    form.reset();
+  } catch (error) {
+    alert(error.message || 'नेटवर्क समस्या के कारण ऑर्डर सेव नहीं हुआ। कृपया दोबारा प्रयास करें।');
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.textContent = 'Place Order';
+    }
+  }
+};
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[char]));
+}
+
+renderCategories();
+renderProducts();
+renderNew();
