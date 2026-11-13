@@ -30,3 +30,13 @@
   #simpleDialog .dialog-card>.dialog-actions{gap:8px}
   #simpleDialog .dialog-card>.dialog-actions button{min-height:46px;padding:10px 14px}
 }
+
+/* Clear bilingual field headings for Add/Edit Product */
+#simpleDialog #dialogBody label{display:block;color:#292536;font-size:14px;font-weight:600;line-height:1.45;margin:14px 0 16px}
+#simpleDialog #dialogBody .field-heading{display:block;color:#292536;font-size:14px;font-weight:750;line-height:1.45;margin:0 0 7px}
+#simpleDialog #dialogBody input,
+#simpleDialog #dialogBody select,
+#simpleDialog #dialogBody textarea{display:block;width:100%;color:#211d29;background:#fff;font-size:15px}
+#simpleDialog #dialogBody input::placeholder,
+#simpleDialog #dialogBody textarea::placeholder{color:#888;opacity:1}
+#simpleDialog #dialogBody .field-help{display:block;color:#686273;font-size:12px;font-weight:400;margin-top:6px}
