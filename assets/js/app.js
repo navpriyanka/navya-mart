@@ -28,7 +28,7 @@ function renderCategories(){
  $('categories').innerHTML=tiles;
  $('quickCats').innerHTML=['All Products',...categories.map(c=>c.name)].map(c=>`<button class="${filter===c?'active':''}" data-cat="${c}">${c}</button>`).join('');
 }
-function card(p){return `<article class="product-card"><div class="product-image"><img loading="lazy" src="${p.image}" alt="${p.name}" onerror="this.style.display='none';this.parentElement.classList.add('image-failed')"><span class="product-tag">${p.tag}</span><button class="wish" data-wish="${p.id}" aria-label="Wishlist">♡</button></div><div class="product-info"><div class="product-category">${p.category}</div><div class="product-name">${p.name}</div><div class="rating">★ ${p.rating}</div><div class="price-line"><span class="price">${money(p.price)}</span><del class="old-price">${money(p.old)}</del><span class="discount">${p.discount}</span></div><div class="cod-line">✓ Free Cash on Delivery</div><button class="add-btn" data-add="${p.id}">＋ Add to Cart</button></div></article>`}
+function card(p){return `<article class="product-card"><div class="product-image product-open" data-open-product="${escapeHTML(p.id)}" role="button" tabindex="0" aria-label="${escapeHTML(p.name)} की पूरी जानकारी देखें"><img loading="lazy" src="${escapeHTML(p.image||'')}" alt="${escapeHTML(p.name)}" onerror="this.style.display='none';this.parentElement.classList.add('image-failed')"><span class="product-tag">${escapeHTML(p.tag||'NEW')}</span><button class="wish" data-wish="${escapeHTML(p.id)}" aria-label="Wishlist">♡</button></div><div class="product-info"><div class="product-category">${escapeHTML(p.category||'')}</div><div class="product-name product-open" data-open-product="${escapeHTML(p.id)}" role="button" tabindex="0">${escapeHTML(p.name)}</div><div class="rating">★ ${escapeHTML(p.rating||'New')}</div><div class="price-line"><span class="price">${money(Number(p.price||0))}</span>${p.old&&Number(p.old)>Number(p.price)?`<del class="old-price">${money(Number(p.old))}</del><span class="discount">${escapeHTML(p.discount||'')}</span>`:''}</div><div class="cod-line">✓ Free Cash on Delivery</div><button class="add-btn" data-add="${escapeHTML(p.id)}">＋ Add to Cart</button><button class="explore-btn" data-open-product="${escapeHTML(p.id)}">Explore Product →</button></div></article>`}
 function filtered(){const q=$('search').value.trim().toLowerCase();return products.filter(p=>(filter==='All Products'||p.category===filter)&&(`${p.name} ${p.category}`).toLowerCase().includes(q))}
 function renderProducts(){const list=filtered();$('heading').innerHTML=(filter==='All Products'?'लोकप्रिय प्रोडक्ट्स':filter+' कलेक्शन')+' <span>✦</span>';$('products').innerHTML=list.length?list.map(card).join(''):'<div class="empty">कोई प्रोडक्ट नहीं मिला। दूसरा नाम खोजें।</div>';}
 function renderNew(){ $('newArrivals').innerHTML=products.slice(2,6).map(card).join(''); }
@@ -37,7 +37,43 @@ function total(){return products.reduce((s,p)=>s+p.price*(cart[p.id]||0),0)}
 function renderCart(){const items=products.filter(p=>cart[p.id]);$('cartView').innerHTML=items.length?items.map(p=>`<div class="cart-row"><span>${p.name}<br><b>${money(p.price)}</b></span><span class="qty"><button data-qty="${p.id}" data-step="-1">−</button> ${cart[p.id]} <button data-qty="${p.id}" data-step="1">+</button></span></div>`).join('')+`<div class="cart-total"><span>Total</span><b>${money(total())}</b></div><p class="free-cod-note">✓ Free COD · कोई अतिरिक्त COD शुल्क नहीं</p><button class="checkout-btn" id="checkoutBtn">Proceed to Checkout</button>`:'<div class="empty">आपका Cart अभी खाली है।<br>अपनी पसंद के प्रोडक्ट जोड़ें।</div>';if($('checkoutBtn'))$('checkoutBtn').onclick=()=>{$('cartView').classList.add('hidden');$('checkoutView').classList.remove('hidden');$('modalTitle').textContent='Checkout · COD'};}
 function openCart(){$('overlay').classList.add('show');$('cartView').classList.remove('hidden');$('checkoutView').classList.add('hidden');$('preview').classList.add('hidden');$('modalTitle').textContent='आपका Cart';renderCart()}
 
+
+function openProductDetails(id){
+ const p=products.find(item=>String(item.id)===String(id));
+ if(!p)return;
+ const photos=[...new Set([...(Array.isArray(p.images)?p.images:[]),p.image].filter(Boolean))];
+ const gallery=photos.length?photos:[];
+ const content=$('productDetailContent');
+ content.innerHTML=`<div class="detail-gallery">
+   <div class="detail-main-image"><img id="detailMainImage" src="${escapeHTML(gallery[0]||'')}" alt="${escapeHTML(p.name)}" ${gallery.length?'':'hidden'}>${gallery.length?'':'<div class="detail-no-image">फोटो उपलब्ध नहीं है</div>'}</div>
+   ${gallery.length>1?`<div class="detail-thumbs">${gallery.map((src,i)=>`<button type="button" class="detail-thumb ${i===0?'active':''}" data-gallery-index="${i}" aria-label="फोटो ${i+1}"><img src="${escapeHTML(src)}" alt=""></button>`).join('')}</div>`:''}
+ </div>
+ <div class="detail-copy"><div class="detail-category">${escapeHTML(p.category||'')}</div><h2 id="detailName">${escapeHTML(p.name)}</h2>
+ <div class="detail-price">${money(Number(p.price||0))}</div><p class="detail-stock">${Number(p.stock||0)>0?'✓ उपलब्ध स्टॉक: '+Number(p.stock)+' पीस':'स्टॉक की जानकारी के लिए संपर्क करें'}</p>
+ <div class="detail-description"><h3>प्रोडक्ट की जानकारी</h3><p>${escapeHTML(p.description||'इस प्रोडक्ट का विस्तृत विवरण जल्द जोड़ा जाएगा।')}</p></div>
+ <div class="detail-specs"><div><b>Category</b><span>${escapeHTML(p.category||'—')}</span></div><div><b>Price</b><span>${money(Number(p.price||0))}</span></div></div>
+ <p class="detail-cod">✓ Free Cash on Delivery · कोई अतिरिक्त COD शुल्क नहीं</p>
+ <div class="detail-actions"><button type="button" class="detail-add" data-detail-add="${escapeHTML(p.id)}">＋ Add to Cart</button><button type="button" class="detail-buy" data-detail-buy="${escapeHTML(p.id)}">Buy Now</button></div>
+ <section class="reviews-section"><h3>Customer Reviews</h3><p>अभी इस प्रोडक्ट के लिए कोई ग्राहक समीक्षा उपलब्ध नहीं है।</p></section></div>`;
+ $('productDetailOverlay').classList.add('show');
+ $('productDetailOverlay').setAttribute('aria-hidden','false');
+ document.body.classList.add('detail-open');
+}
+function closeProductDetails(){
+ $('productDetailOverlay').classList.remove('show');
+ $('productDetailOverlay').setAttribute('aria-hidden','true');
+ document.body.classList.remove('detail-open');
+}
+
 document.addEventListener('click',e=>{
+ const galleryThumb=e.target.closest('[data-gallery-index]');
+ if(galleryThumb){const p=$('productDetailContent').querySelector('#detailMainImage');const current=products.find(x=>String(x.id)===String($('productDetailContent').querySelector('[data-detail-add]')?.dataset.detailAdd));const imgs=[...new Set([...(Array.isArray(current?.images)?current.images:[]),current?.image].filter(Boolean))];p.src=imgs[Number(galleryThumb.dataset.galleryIndex)]||p.src;$('productDetailContent').querySelectorAll('.detail-thumb').forEach(b=>b.classList.toggle('active',b===galleryThumb));return}
+ const detailAdd=e.target.closest('[data-detail-add]');
+ if(detailAdd){const id=detailAdd.dataset.detailAdd;cart[id]=(cart[id]||0)+1;updateCount();detailAdd.textContent='✓ Added to Cart';return}
+ const detailBuy=e.target.closest('[data-detail-buy]');
+ if(detailBuy){const id=detailBuy.dataset.detailBuy;cart[id]=(cart[id]||0)+1;updateCount();closeProductDetails();openCart();return}
+ const openDetail=e.target.closest('[data-open-product]');
+ if(openDetail){openProductDetails(openDetail.dataset.openProduct);return}
  const cat=e.target.closest('[data-cat]');
  if(cat){filter=cat.dataset.cat;renderCategories();renderProducts();$('catalog').scrollIntoView({behavior:'smooth'});return}
  const add=e.target.closest('[data-add]');
@@ -167,3 +203,15 @@ async function loadPublishedProducts() {
 }
 
 loadPublishedProducts();
+
+document.addEventListener('keydown',e=>{
+ if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-open-product]')){e.preventDefault();openProductDetails(e.target.dataset.openProduct)}
+ if(e.key==='Escape'){closeProductDetails();$('imageLightbox').classList.remove('show')}
+});
+$('closeProductDetails').onclick=closeProductDetails;
+$('productDetailOverlay').addEventListener('click',e=>{if(e.target===$('productDetailOverlay'))closeProductDetails()});
+$('closeLightbox').onclick=()=>$('imageLightbox').classList.remove('show');
+$('detailMainImage')?.addEventListener('click',()=>{});
+document.addEventListener('click',e=>{
+ if(e.target.id==='detailMainImage'&&e.target.src){$('lightboxImage').src=e.target.src;$('imageLightbox').classList.add('show')}
+});
