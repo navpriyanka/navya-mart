@@ -20,8 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function openForm(product=null){
     const dialog=document.getElementById('simpleDialog'),body=document.getElementById('dialogBody'),title=document.getElementById('dialogTitle'),save=document.getElementById('dialogSave');
     title.textContent=product?'Edit Product':'Add New Product';
-    body.innerHTML=`<button type="button" class="dialog-close" id="productClose" aria-label="Close">×</button>
-      <label>Product Name<input name="name" required value="${esc(product?.name||'')}"></label>
+    body.innerHTML=`<label>Product Name<input name="name" required value="${esc(product?.name||'')}"></label>
       <label>Category<select name="category" required><option value="">Select category</option>${['Men','Women','Kids','Home','Beauty','Sarees','Electronics','Puja Articles'].map(c=>`<option ${product?.category===c?'selected':''}>${c}</option>`).join('')}</select></label>
       <label>Source (जैसे Meesho)<input name="source" value="${esc(product?.source||'')}" placeholder="Meesho / Supplier"></label>
       <label>Supplier Product Code<input name="supplier_product_id" value="${esc(product?.supplier_product_id||'')}" placeholder="Supplier का product code"></label>
@@ -32,12 +31,15 @@ document.addEventListener('DOMContentLoaded', () => {
       <label>Product Details<textarea name="description" rows="4">${esc(product?.description||'')}</textarea></label>
       <label>Product Photos (1–5; JPG/PNG/WEBP, max 5 MB each)<input name="images" type="file" accept="image/jpeg,image/png,image/webp" multiple ${product?'':'required'}></label>
       <label>Admin API Key<input name="admin_key" type="password" required autocomplete="current-password"></label>
-      <p class="helper">नई फोटो चुनने पर पुरानी gallery replace होगी। फोटो R2 में और विवरण D1 में सेव होंगे।</p>
-      <div class="dialog-actions"><button type="button" class="secondary-btn" id="productCancel">Cancel</button><button type="button" class="primary-btn" id="productSave">Save Product</button></div>`;
+      <p class="helper">नई फोटो चुनने पर पुरानी gallery replace होगी। फोटो R2 में और विवरण D1 में सेव होंगे।</p>`;
     const form=body.closest('.dialog-card');
     const close=()=>dialog.close();
-    body.querySelector('#productClose').onclick=close;body.querySelector('#productCancel').onclick=close;
-    body.querySelector('#productSave').onclick=async()=>{
+    const closeBtn=form.querySelector('.dialog-close');
+    const cancelBtn=document.getElementById('productCancel');
+    const saveBtn=document.getElementById('dialogSave');
+    closeBtn.onclick=close;
+    cancelBtn.onclick=close;
+    saveBtn.onclick=async()=>{
       const fd=new FormData(form), photos=fd.getAll('images').filter(f=>f&&f.size);
       if(!product&&(!photos.length||photos.length>5)){AdminUI.showToast('1 से 5 फोटो चुनें।');return}
       if(photos.length>5){AdminUI.showToast('अधिकतम 5 फोटो चुनें।');return}
@@ -47,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const key=String(fd.get('admin_key')||'');
       const endpoint=product?`${API}/api/admin/products/${encodeURIComponent(product.id)}`:`${API}/api/admin/products`;
       const method=product?'PUT':'POST';
-      const saveBtn=body.querySelector('#productSave');saveBtn.disabled=true;saveBtn.textContent='Saving...';
+      saveBtn.disabled=true;saveBtn.textContent='Saving...';
       try{
         const r=await fetch(endpoint,{method,headers:{Authorization:`Bearer ${key}`},body:upload}),d=await r.json();
         if(!r.ok||!d.ok)throw Error(d.error||'सेव नहीं हुआ');
