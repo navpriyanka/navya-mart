@@ -1,0 +1,8 @@
+NAVYA MART - Product upload setup
+
+1) Cloudflare D1 Console > navya-mart-db में cloudflare-products-migration.sql एक बार चलाएँ। इससे मौजूदा products table में purchase_cost कॉलम जुड़ेगा; कोई नई table नहीं बनेगी।
+2) Worker navya-mart-api में cloudflare-worker.js का पूरा code deploy करें। Bindings: DB -> navya-mart-db, IMAGES -> navya-mart-images. Secret: ADMIN_API_KEY (पहले से बनाया हुआ) रखें।
+3) GitHub repository में इस ZIP के admin/ और assets/ फोल्डर अपडेट करें। Root index.html checkout flow जस का तस रखा गया है; app.js अब API से active products भी लोड करेगा।
+4) Admin Panel > Products > Add Product में नाम, कीमत, खरीद मूल्य, स्टॉक, फोटो (1-5) और ADMIN_API_KEY डालकर Save Product करें।
+
+ध्यान दें: यह बेसिक shared-secret सुरक्षा है, पूर्ण multi-user admin login नहीं। ADMIN_API_KEY को किसी से साझा न करें। COD checkout endpoint और उसकी existing order tables को बरकरार रखा गया है।
