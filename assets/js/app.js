@@ -130,6 +130,40 @@ function escapeHTML(value) {
   }[char]));
 }
 
-renderCategories();
-renderProducts();
-renderNew();
+async function loadPublishedProducts() {
+  try {
+    const response = await fetch(`${API_BASE}/api/products`);
+    const result = await response.json();
+    if (!response.ok || !result.ok || !Array.isArray(result.products)) return;
+    const byId = new Map(products.map(p => [String(p.id), p]));
+    for (const live of result.products) {
+      const existing = byId.get(String(live.id));
+      const mapped = {
+        ...(existing || {}),
+        ...live,
+        id: live.id,
+        name: live.name || existing?.name || 'Product',
+        category: live.category || existing?.category || 'Men',
+        price: Number(live.price || existing?.price || 0),
+        old: Number(live.old || existing?.old || live.price || 0),
+        discount: live.discount || existing?.discount || '',
+        tag: live.tag || existing?.tag || 'NEW',
+        rating: live.rating || existing?.rating || '',
+        image: live.image || existing?.image || ''
+      };
+      if (existing) {
+        const index = products.findIndex(p => String(p.id) === String(live.id));
+        products[index] = mapped;
+      } else {
+        products.push(mapped);
+      }
+    }
+  } catch (error) {
+    // Keep the existing storefront catalog visible if the API is temporarily unavailable.
+  }
+  renderCategories();
+  renderProducts();
+  renderNew();
+}
+
+loadPublishedProducts();
