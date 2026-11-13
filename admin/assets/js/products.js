@@ -20,17 +20,17 @@ document.addEventListener('DOMContentLoaded', () => {
   function openForm(product=null){
     const dialog=document.getElementById('simpleDialog'),body=document.getElementById('dialogBody'),title=document.getElementById('dialogTitle'),save=document.getElementById('dialogSave');
     title.textContent=product?'Edit Product':'Add New Product';
-    body.innerHTML=`<label>Product Name<input name="name" required value="${esc(product?.name||'')}"></label>
-      <label>Category<select name="category" required><option value="">Select category</option>${['Men','Women','Kids','Home','Beauty','Sarees','Electronics','Puja Articles'].map(c=>`<option ${product?.category===c?'selected':''}>${c}</option>`).join('')}</select></label>
-      <label>Source (जैसे Meesho)<input name="source" value="${esc(product?.source||'')}" placeholder="Meesho / Supplier"></label>
-      <label>Supplier Product Code<input name="supplier_product_id" value="${esc(product?.supplier_product_id||'')}" placeholder="Supplier का product code"></label>
-      <label>SKU (Optional)<input name="sku" value="${esc(product?.sku||'')}"></label>
-      <label>Selling Price (₹)<input name="selling_price" type="number" min="1" required value="${product?.price??''}"></label>
-      <label>Purchase Cost (₹)<input name="purchase_cost" type="number" min="0" value="${product?.purchase_cost??''}"></label>
-      <label>Stock Quantity<input name="stock" type="number" min="0" required value="${product?.stock??''}"></label>
-      <label>Product Details<textarea name="description" rows="4">${esc(product?.description||'')}</textarea></label>
-      <label>Product Photos (1–5; JPG/PNG/WEBP, max 5 MB each)<input name="images" type="file" accept="image/jpeg,image/png,image/webp" multiple ${product?'':'required'}></label>
-      <label>Admin API Key<input name="admin_key" type="password" required autocomplete="current-password"></label>
+    body.innerHTML=`<label><span class="field-heading">प्रोडक्ट का नाम (Product Name)</span><input name="name" required value="${esc(product?.name||'')}" placeholder="यहाँ प्रोडक्ट का पूरा नाम लिखें"></label>
+      <label><span class="field-heading">श्रेणी चुनें (Category)</span><select name="category" required><option value="">श्रेणी चुनें / Select category</option>${['Men','Women','Kids','Home','Beauty','Sarees','Electronics','Puja Articles'].map(c=>`<option ${product?.category===c?'selected':''}>${c}</option>`).join('')}</select></label>
+      <label><span class="field-heading">कहाँ से खरीदा? (Source)</span><input name="source" value="${esc(product?.source||'')}" placeholder="जैसे: Meesho / Supplier"></label>
+      <label><span class="field-heading">सप्लायर प्रोडक्ट कोड (Supplier Product Code)</span><input name="supplier_product_id" value="${esc(product?.supplier_product_id||'')}" placeholder="Meesho या Supplier का कोड"></label>
+      <label><span class="field-heading">अपना प्रोडक्ट कोड (SKU – Optional)</span><input name="sku" value="${esc(product?.sku||'')}" placeholder="अपनी पहचान के लिए कोड (वैकल्पिक)"></label>
+      <label><span class="field-heading">बेचने की कीमत (Selling Price ₹)</span><input name="selling_price" type="number" min="1" required value="${product?.price??''}" placeholder="ग्राहक से कितने रुपये लेने हैं?"></label>
+      <label><span class="field-heading">खरीदने की कीमत (Purchase Cost ₹)</span><input name="purchase_cost" type="number" min="0" value="${product?.purchase_cost??''}" placeholder="आपने कितने रुपये में खरीदा?"></label>
+      <label><span class="field-heading">उपलब्ध स्टॉक (Stock Quantity)</span><input name="stock" type="number" min="0" required value="${product?.stock??''}" placeholder="कितने पीस उपलब्ध हैं?"></label>
+      <label><span class="field-heading">प्रोडक्ट की पूरी जानकारी (Product Details)</span><textarea name="description" rows="4" placeholder="कपड़ा, रंग, डिजाइन, साइज, पैकिंग आदि लिखें">${esc(product?.description||'')}</textarea></label>
+      <label><span class="field-heading">प्रोडक्ट की फोटो (Product Photos – 1 से 5)</span><input name="images" type="file" accept="image/jpeg,image/png,image/webp" multiple ${product?'':'required'}><small class="field-help">JPG, PNG या WEBP फोटो चुनें। हर फोटो अधिकतम 5 MB हो।</small></label>
+      <label><span class="field-heading">Admin API Key (एडमिन पासवर्ड)</span><input name="admin_key" type="password" required autocomplete="current-password" placeholder="Cloudflare Admin API Key डालें"></label>
       <p class="helper">नई फोटो चुनने पर पुरानी gallery replace होगी। फोटो R2 में और विवरण D1 में सेव होंगे।</p>`;
     const form=body.closest('.dialog-card');
     const close=()=>dialog.close();
