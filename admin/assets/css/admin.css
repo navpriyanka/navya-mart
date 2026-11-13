@@ -13,3 +13,20 @@
 #dialogBody .dialog-actions{position:sticky;bottom:0;background:#fff;padding:12px 0 2px}
 #dialogBody label{clear:both}
 #dialogBody input[type=file]{padding:9px}
+
+/* Clean, single-control Add/Edit Product dialog */
+#simpleDialog{width:100%;max-width:none;max-height:100%;padding:0;border:0;background:transparent;overflow:visible}
+#simpleDialog::backdrop{background:rgba(20,16,30,.58)}
+#simpleDialog .dialog-card{box-sizing:border-box;width:min(560px,calc(100vw - 24px));max-height:90vh;max-height:90dvh;margin:auto;padding:22px 20px 16px;display:flex;flex-direction:column;overflow:hidden}
+#simpleDialog .dialog-card>.dialog-close{flex:0 0 auto;order:0;width:34px;height:34px;font-size:22px}
+#simpleDialog .dialog-card>h3{order:1;flex:0 0 auto;margin:2px 48px 14px 0}
+#simpleDialog #dialogBody{order:2;flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto;overscroll-behavior:contain;padding:0 4px 12px 0}
+#simpleDialog .dialog-card>.dialog-actions{order:3;flex:0 0 auto;margin:0;padding:12px 0 0;background:#fff;border-top:1px solid #eee;position:relative;z-index:2}
+#simpleDialog .dialog-card label{display:block;margin:12px 0 14px}
+#simpleDialog .dialog-card input,#simpleDialog .dialog-card select,#simpleDialog .dialog-card textarea{box-sizing:border-box;max-width:100%}
+#simpleDialog .dialog-card input[type=file]{font-size:14px;padding:10px}
+@media(max-width:600px){
+  #simpleDialog .dialog-card{width:calc(100vw - 20px);max-height:88vh;max-height:88dvh;padding:18px 15px 13px;border-radius:14px}
+  #simpleDialog .dialog-card>.dialog-actions{gap:8px}
+  #simpleDialog .dialog-card>.dialog-actions button{min-height:46px;padding:10px 14px}
+}
