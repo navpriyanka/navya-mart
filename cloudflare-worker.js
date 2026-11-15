@@ -73,7 +73,7 @@ export default {
       try {
         const { results = [] } = await env.DB.prepare(`
           SELECT p.id, p.name, p.slug, p.description, p.selling_price, p.stock,
-                 p.main_image_key, p.gallery_images, p.is_active,
+                 p.main_image_key, p.gallery_images, p.is_active, p.variants_json,
                  COALESCE(c.name, 'Men') AS category
           FROM products p
           LEFT JOIN categories c ON c.id = p.category_id
@@ -88,6 +88,8 @@ export default {
             old: Number(p.selling_price || 0), discount: "", tag: "NEW",
             rating: "", image: p.main_image_key ? `${url.origin}/api/images/${encodeURIComponent(p.main_image_key)}` : "",
             images: keys.map(k => `${url.origin}/api/images/${encodeURIComponent(k)}`),
+            variants: (() => { try { return JSON.parse(p.variants_json || '[]'); } catch { return []; } })(),
+            sizes: (() => { try { return JSON.parse(p.variants_json || '{}').sizes || []; } catch { return []; } })(),
             stock: Number(p.stock || 0)
           };
         });
@@ -117,6 +119,9 @@ export default {
       const sellingPrice = Number(form.get("selling_price"));
       const purchaseCost = Number(form.get("purchase_cost") || 0);
       const stock = Number(form.get("stock") || 0);
+      const colors = cleanText(form.get("colors"), 500).split(",").map(x=>x.trim()).filter(Boolean).slice(0,10);
+      const sizes = cleanText(form.get("sizes"), 300).split(",").map(x=>x.trim()).filter(Boolean).slice(0,15);
+      const variants = colors.map((color,index)=>({color,imageIndex:index}));
       const files = form.getAll("images").filter(f => f && typeof f.arrayBuffer === "function" && f.size > 0);
 
       if (name.length < 2 || !Number.isFinite(sellingPrice) || sellingPrice <= 0 ||
@@ -147,12 +152,12 @@ export default {
         await env.DB.prepare(`
           INSERT INTO products
           (id, name, slug, description, price, selling_price, purchase_cost, stock, sku,
-           main_image_key, gallery_images, is_active, created_at, updated_at)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+           main_image_key, gallery_images, variants_json, is_active, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         `).bind(
           id, name, name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""),
           description, sellingPrice, sellingPrice, purchaseCost, stock, sku || null,
-          uploaded[0], JSON.stringify(uploaded)
+          uploaded[0], JSON.stringify(uploaded), JSON.stringify({colors, sizes, variants})
         ).run();
 
         return json({
@@ -195,13 +200,15 @@ export default {
       for (const raw of incomingItems) {
         const id = String(raw?.id ?? "");
         const quantity = Number(raw?.quantity);
+        const selectedColor = cleanText(raw?.color, 60);
+        const selectedSize = cleanText(raw?.size, 30);
         if (!Number.isInteger(quantity) || quantity < 1 || quantity > 20) {
           return json({ ok: false, error: "Cart में अमान्य quantity है।" }, 400);
         }
         let product = null;
         try {
           product = await env.DB.prepare(
-            "SELECT id, name, selling_price AS price, stock FROM products WHERE id = ? AND is_active = 1 LIMIT 1"
+            "SELECT id, name, selling_price AS price, stock, variants_json FROM products WHERE id = ? AND is_active = 1 LIMIT 1"
           ).bind(id).first();
         } catch {}
         if (!product && CATALOG[id]) product = { id, ...CATALOG[id], stock: 9999 };
@@ -211,7 +218,7 @@ export default {
         const price = Number(product.price);
         const lineTotal = price * quantity;
         total += lineTotal;
-        items.push({ id, quantity, price, lineTotal });
+        items.push({ id, quantity, price, lineTotal, color:selectedColor, size:selectedSize });
       }
       if (!Number.isSafeInteger(total) || total <= 0 || total > 200000) return json({ ok: false, error: "Order amount is invalid." }, 400);
 
@@ -238,8 +245,8 @@ export default {
         ];
         for (const item of items) {
           statements.push(env.DB.prepare(`INSERT INTO order_items
-            (id, order_id, product_id, quantity, unit_price, total_price)
-            VALUES (?, ?, ?, ?, ?, ?)`).bind(randomId(), orderId, item.id, item.quantity, item.price, item.lineTotal));
+            (id, order_id, product_id, quantity, unit_price, total_price, variant_color, variant_size)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`).bind(randomId(), orderId, item.id, item.quantity, item.price, item.lineTotal, item.color || null, item.size || null));
         }
         await env.DB.batch(statements);
         return json({
