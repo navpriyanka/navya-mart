@@ -94,3 +94,11 @@
 .image-lightbox button{position:absolute;right:16px;top:16px;border:0;border-radius:50%;width:42px;height:42px;background:#fff;color:#211d29;font-size:20px}
 body.detail-open{overflow:hidden}
 @media(min-width:701px){.detail-overlay{align-items:center;padding:24px}.detail-panel{border-radius:18px;max-height:90vh}.detail-head{border-radius:18px 18px 0 0}}
+
+/* Product color and size selection */
+.variant-picker{margin:16px 0;display:grid;gap:9px}
+.variant-picker label{font-size:13px;font-weight:850;color:var(--ink);margin-top:5px}
+.variant-options{display:flex;flex-wrap:wrap;gap:8px}
+.variant-option{border:1px solid var(--line);background:#fff;color:var(--ink);padding:8px 13px;border-radius:9px;font-size:13px;font-weight:750}
+.variant-option.selected{border:2px solid var(--purple);background:#f5effb;color:var(--purple);padding:7px 12px}
+.cart-variant{display:block;color:var(--muted);font-size:11px;margin:3px 0}
