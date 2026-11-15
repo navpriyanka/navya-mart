@@ -28,6 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
       <label><span class="field-heading">बेचने की कीमत (Selling Price ₹)</span><input name="selling_price" type="number" min="1" required value="${product?.price??''}" placeholder="ग्राहक से कितने रुपये लेने हैं?"></label>
       <label><span class="field-heading">खरीदने की कीमत (Purchase Cost ₹)</span><input name="purchase_cost" type="number" min="0" value="${product?.purchase_cost??''}" placeholder="आपने कितने रुपये में खरीदा?"></label>
       <label><span class="field-heading">उपलब्ध स्टॉक (Stock Quantity)</span><input name="stock" type="number" min="0" required value="${product?.stock??''}" placeholder="कितने पीस उपलब्ध हैं?"></label>
+      <label><span class="field-heading">उपलब्ध रंग (Available Colors)</span><input name="colors" value="${esc((product?.variants||[]).map(v=>v.color).join(', '))}" placeholder="Black, Blue, Red"></label>
+      <small class="field-help">रंगों का क्रम फोटो के क्रम से मिलाएँ: पहली फोटो पहला रंग, दूसरी फोटो दूसरा रंग।</small>
+      <label><span class="field-heading">उपलब्ध साइज (Available Sizes)</span><input name="sizes" value="${esc((product?.sizes||[]).join(', '))}" placeholder="M, L, XL, XXL, XXXL"></label>
       <label><span class="field-heading">प्रोडक्ट की पूरी जानकारी (Product Details)</span><textarea name="description" rows="4" placeholder="कपड़ा, रंग, डिजाइन, साइज, पैकिंग आदि लिखें">${esc(product?.description||'')}</textarea></label>
       <label><span class="field-heading">प्रोडक्ट की फोटो (Product Photos – 1 से 5)</span><input name="images" type="file" accept="image/jpeg,image/png,image/webp" multiple ${product?'':'required'}><small class="field-help">JPG, PNG या WEBP फोटो चुनें। हर फोटो अधिकतम 5 MB हो।</small></label>
       <label><span class="field-heading">Admin API Key (एडमिन पासवर्ड)</span><input name="admin_key" type="password" required autocomplete="current-password" placeholder="Cloudflare Admin API Key डालें"></label>
@@ -44,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if(!product&&(!photos.length||photos.length>5)){AdminUI.showToast('1 से 5 फोटो चुनें।');return}
       if(photos.length>5){AdminUI.showToast('अधिकतम 5 फोटो चुनें।');return}
       const upload=new FormData();
-      ['name','category','source','supplier_product_id','sku','selling_price','purchase_cost','stock','description'].forEach(k=>upload.append(k,fd.get(k)||''));
+      ['name','category','source','supplier_product_id','sku','selling_price','purchase_cost','stock','description','colors','sizes'].forEach(k=>upload.append(k,fd.get(k)||''));
       photos.forEach(f=>upload.append('images',f));
       const key=String(fd.get('admin_key')||'');
       const endpoint=product?`${API}/api/admin/products/${encodeURIComponent(product.id)}`:`${API}/api/admin/products`;
