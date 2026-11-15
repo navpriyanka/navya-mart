@@ -20,7 +20,7 @@ const products = [
  {id:7,name:'Beauty Essentials Set',category:'Beauty',price:299,old:449,discount:'33% OFF',tag:'POPULAR',rating:'4.1',image:'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=700&q=78'},
  {id:8,name:'Wireless Headphones',category:'Electronics',price:799,old:1199,discount:'33% OFF',tag:'NEW',rating:'4.3',image:'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=700&q=78'}
 ];
-let filter='All Products', cart={};
+let filter='All Products', cart={}, cartSelections={};
 const $=id=>document.getElementById(id), money=n=>'₹'+n.toLocaleString('en-IN');
 
 function renderCategories(){
@@ -34,7 +34,7 @@ function renderProducts(){const list=filtered();$('heading').innerHTML=(filter==
 function renderNew(){ $('newArrivals').innerHTML=products.slice(2,6).map(card).join(''); }
 function updateCount(){const n=Object.values(cart).reduce((a,b)=>a+b,0);$('count').textContent=n;$('bottomCount').textContent=n}
 function total(){return products.reduce((s,p)=>s+p.price*(cart[p.id]||0),0)}
-function renderCart(){const items=products.filter(p=>cart[p.id]);$('cartView').innerHTML=items.length?items.map(p=>`<div class="cart-row"><span>${p.name}<br><b>${money(p.price)}</b></span><span class="qty"><button data-qty="${p.id}" data-step="-1">−</button> ${cart[p.id]} <button data-qty="${p.id}" data-step="1">+</button></span></div>`).join('')+`<div class="cart-total"><span>Total</span><b>${money(total())}</b></div><p class="free-cod-note">✓ Free COD · कोई अतिरिक्त COD शुल्क नहीं</p><button class="checkout-btn" id="checkoutBtn">Proceed to Checkout</button>`:'<div class="empty">आपका Cart अभी खाली है।<br>अपनी पसंद के प्रोडक्ट जोड़ें।</div>';if($('checkoutBtn'))$('checkoutBtn').onclick=()=>{$('cartView').classList.add('hidden');$('checkoutView').classList.remove('hidden');$('modalTitle').textContent='Checkout · COD'};}
+function renderCart(){const items=products.filter(p=>cart[p.id]);$('cartView').innerHTML=items.length?items.map(p=>`<div class="cart-row"><span>${p.name}<small class="cart-variant">${escapeHTML(cartSelections[p.id]?.color||'')} ${escapeHTML(cartSelections[p.id]?.size||'')}</small><br><b>${money(p.price)}</b></span><span class="qty"><button data-qty="${p.id}" data-step="-1">−</button> ${cart[p.id]} <button data-qty="${p.id}" data-step="1">+</button></span></div>`).join('')+`<div class="cart-total"><span>Total</span><b>${money(total())}</b></div><p class="free-cod-note">✓ Free COD · कोई अतिरिक्त COD शुल्क नहीं</p><button class="checkout-btn" id="checkoutBtn">Proceed to Checkout</button>`:'<div class="empty">आपका Cart अभी खाली है।<br>अपनी पसंद के प्रोडक्ट जोड़ें।</div>';if($('checkoutBtn'))$('checkoutBtn').onclick=()=>{$('cartView').classList.add('hidden');$('checkoutView').classList.remove('hidden');$('modalTitle').textContent='Checkout · COD'};}
 function openCart(){$('overlay').classList.add('show');$('cartView').classList.remove('hidden');$('checkoutView').classList.add('hidden');$('preview').classList.add('hidden');$('modalTitle').textContent='आपका Cart';renderCart()}
 
 
@@ -50,6 +50,10 @@ function openProductDetails(id){
  </div>
  <div class="detail-copy"><div class="detail-category">${escapeHTML(p.category||'')}</div><h2 id="detailName">${escapeHTML(p.name)}</h2>
  <div class="detail-price">${money(Number(p.price||0))}</div><p class="detail-stock">${Number(p.stock||0)>0?'✓ उपलब्ध स्टॉक: '+Number(p.stock)+' पीस':'स्टॉक की जानकारी के लिए संपर्क करें'}</p>
+ <div class="variant-picker">
+ ${p.variants?.length?`<label>रंग चुनें (Color)</label><div class="variant-options">${p.variants.map((v,i)=>`<button type="button" class="variant-option ${i===0?'selected':''}" data-color="${escapeHTML(v.color)}" data-image-index="${Number(v.imageIndex||0)}">${escapeHTML(v.color)}</button>`).join('')}</div>`:''}
+ ${p.sizes?.length?`<label>साइज चुनें (Size)</label><div class="variant-options">${p.sizes.map((v,i)=>`<button type="button" class="variant-option ${i===0?'selected':''}" data-size="${escapeHTML(v)}">${escapeHTML(v)}</button>`).join('')}</div>`:''}
+ </div>
  <div class="detail-description"><h3>प्रोडक्ट की जानकारी</h3><p>${escapeHTML(p.description||'इस प्रोडक्ट का विस्तृत विवरण जल्द जोड़ा जाएगा।')}</p></div>
  <div class="detail-specs"><div><b>Category</b><span>${escapeHTML(p.category||'—')}</span></div><div><b>Price</b><span>${money(Number(p.price||0))}</span></div></div>
  <p class="detail-cod">✓ Free Cash on Delivery · कोई अतिरिक्त COD शुल्क नहीं</p>
@@ -68,10 +72,14 @@ function closeProductDetails(){
 document.addEventListener('click',e=>{
  const galleryThumb=e.target.closest('[data-gallery-index]');
  if(galleryThumb){const p=$('productDetailContent').querySelector('#detailMainImage');const current=products.find(x=>String(x.id)===String($('productDetailContent').querySelector('[data-detail-add]')?.dataset.detailAdd));const imgs=[...new Set([...(Array.isArray(current?.images)?current.images:[]),current?.image].filter(Boolean))];p.src=imgs[Number(galleryThumb.dataset.galleryIndex)]||p.src;$('productDetailContent').querySelectorAll('.detail-thumb').forEach(b=>b.classList.toggle('active',b===galleryThumb));return}
+ const colorChoice=e.target.closest('[data-color]');
+ if(colorChoice){$('productDetailContent').querySelectorAll('[data-color]').forEach(b=>b.classList.toggle('selected',b===colorChoice));const imageIndex=Number(colorChoice.dataset.imageIndex);const pId=$('productDetailContent').querySelector('[data-detail-add]').dataset.detailAdd;const prod=products.find(p=>String(p.id)===String(pId));const imgs=[...new Set([...(Array.isArray(prod?.images)?prod.images:[]),prod?.image].filter(Boolean))];const main=$('detailMainImage');if(main&&imgs[imageIndex])main.src=imgs[imageIndex];return}
+ const sizeChoice=e.target.closest('[data-size]');
+ if(sizeChoice){$('productDetailContent').querySelectorAll('[data-size]').forEach(b=>b.classList.toggle('selected',b===sizeChoice));return}
  const detailAdd=e.target.closest('[data-detail-add]');
- if(detailAdd){const id=detailAdd.dataset.detailAdd;cart[id]=(cart[id]||0)+1;updateCount();detailAdd.textContent='✓ Added to Cart';return}
+ if(detailAdd){const id=detailAdd.dataset.detailAdd;const prod=products.find(p=>String(p.id)===String(id));const color=$('productDetailContent').querySelector('[data-color].selected')?.dataset.color||'';const size=$('productDetailContent').querySelector('[data-size].selected')?.dataset.size||'';if(prod?.variants?.length&&!color){alert('कृपया Color चुनें।');return}if(prod?.sizes?.length&&!size){alert('कृपया Size चुनें।');return}cartSelections[id]={color,size};cart[id]=(cart[id]||0)+1;updateCount();detailAdd.textContent='✓ Added to Cart';return}
  const detailBuy=e.target.closest('[data-detail-buy]');
- if(detailBuy){const id=detailBuy.dataset.detailBuy;cart[id]=(cart[id]||0)+1;updateCount();closeProductDetails();openCart();return}
+ if(detailBuy){const id=detailBuy.dataset.detailBuy;const prod=products.find(p=>String(p.id)===String(id));const color=$('productDetailContent').querySelector('[data-color].selected')?.dataset.color||'';const size=$('productDetailContent').querySelector('[data-size].selected')?.dataset.size||'';if(prod?.variants?.length&&!color){alert('कृपया Color चुनें।');return}if(prod?.sizes?.length&&!size){alert('कृपया Size चुनें।');return}cartSelections[id]={color,size};cart[id]=(cart[id]||0)+1;updateCount();closeProductDetails();openCart();return}
  const openDetail=e.target.closest('[data-open-product]');
  if(openDetail){openProductDetails(openDetail.dataset.openProduct);return}
  const cat=e.target.closest('[data-cat]');
@@ -101,7 +109,7 @@ $('orderForm').onsubmit = async e => {
   const data = new FormData(form);
   const items = products
     .filter(p => Number(cart[p.id] || 0) > 0)
-    .map(p => ({ id: p.id, quantity: Number(cart[p.id]) }));
+    .map(p => ({ id: p.id, quantity: Number(cart[p.id]), color: cartSelections[p.id]?.color || '', size: cartSelections[p.id]?.size || '' }));
 
   if (!items.length) {
     alert('आपका Cart खाली है। पहले कोई Product जोड़ें।');
