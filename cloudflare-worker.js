@@ -1,6 +1,6 @@
 
 
-const ALLOWED_ORIGIN = "https\://navpriyanka.github.io";
+const ALLOWED_ORIGIN = "https://navpriyanka.github.io";
 
 
 
@@ -112,7 +112,7 @@ export default {
 
 
 
-    *// Health check*
+    // Health check
 
     if (request.method === "GET" && url.pathname === "/api/health") {
 
@@ -142,7 +142,7 @@ export default {
 
 
 
-    *// Image delivery*
+    // Image delivery
 
     if (request.method === "GET" && url.pathname.startsWith("/api/images/")) {
 
@@ -186,7 +186,7 @@ export default {
 
 
 
-    *// Public product list*
+    // Public product list
 
     if (request.method === "GET" && url.pathname === "/api/products") {
 
@@ -302,7 +302,7 @@ export default {
 
 
 
-    *// Admin product list*
+    // Admin product list
 
     if (request.method === "GET" && url.pathname === "/api/admin/products") {
 
@@ -419,7 +419,7 @@ export default {
 
 
 
-    *// Add new product*
+    // Add new product
 
     if (request.method === "POST" && url.pathname === "/api/admin/products") {
 
@@ -510,7 +510,7 @@ export default {
 
         f.size > 5 * 1024 * 1024 ||
 
-        !/^image\\/(jpeg|png|webp)$/.test(f.type)
+        !/^image\/(jpeg|png|webp)$/.test(f.type)
 
       )) {
 
@@ -666,7 +666,7 @@ export default {
 
 
 
-    *// Edit product / soft delete*
+    // Edit product / soft delete
 
     if (url.pathname.startsWith("/api/admin/products/") &&
 
@@ -775,7 +775,7 @@ export default {
 
         f.size > 5 * 1024 * 1024 ||
 
-        !/^image\\/(jpeg|png|webp)$/.test(f.type)
+        !/^image\/(jpeg|png|webp)$/.test(f.type)
 
       )) {
 
@@ -936,7 +936,7 @@ export default {
 
 
 
-    *// COD orders - existing checkout flow retained*
+    // COD orders - existing checkout flow retained
 
     if (request.method === "POST" && url.pathname === "/api/orders") {
 
