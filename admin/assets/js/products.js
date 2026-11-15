@@ -3,9 +3,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const btn=document.getElementById('addProductBtn'), rows=document.getElementById('productRows');
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   let cache=[];
+  let adminKey='';
   async function loadProducts(){
     try{
-      const r=await fetch(`${API}/api/products`),d=await r.json();
+      if(!adminKey){adminKey=String(prompt('Admin API Key डालें (Cloudflare ADMIN_API_KEY की value):')||'');if(!adminKey){rows.innerHTML='<tr><td colspan="7" class="table-empty">Admin API Key के बिना प्रोडक्ट सूची नहीं खुल सकती। पेज रीफ्रेश करके दोबारा प्रयास करें।</td></tr>';return;}}
+      const r=await fetch(`${API}/api/admin/products`,{headers:{Authorization:`Bearer ${adminKey}`}}),d=await r.json();
       if(!r.ok||!d.ok)throw Error(d.error||'लोड नहीं हुआ');
       cache=d.products||[];
       rows.innerHTML=cache.length?cache.map(p=>`<tr>
@@ -33,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <label><span class="field-heading">उपलब्ध साइज (Available Sizes)</span><input name="sizes" value="${esc((product?.sizes||[]).join(', '))}" placeholder="M, L, XL, XXL, XXXL"></label>
       <label><span class="field-heading">प्रोडक्ट की पूरी जानकारी (Product Details)</span><textarea name="description" rows="4" placeholder="कपड़ा, रंग, डिजाइन, साइज, पैकिंग आदि लिखें">${esc(product?.description||'')}</textarea></label>
       <label><span class="field-heading">प्रोडक्ट की फोटो (Product Photos – 1 से 5)</span><input name="images" type="file" accept="image/jpeg,image/png,image/webp" multiple ${product?'':'required'}><small class="field-help">JPG, PNG या WEBP फोटो चुनें। हर फोटो अधिकतम 5 MB हो।</small></label>
-      <label><span class="field-heading">Admin API Key (एडमिन पासवर्ड)</span><input name="admin_key" type="password" required autocomplete="current-password" placeholder="Cloudflare Admin API Key डालें"></label>
+      <label><span class="field-heading">Admin API Key (एडमिन पासवर्ड)</span><input name="admin_key" type="password" required autocomplete="current-password" value="${esc(adminKey)}" placeholder="Cloudflare Admin API Key डालें"></label>
       <p class="helper">नई फोटो चुनने पर पुरानी gallery replace होगी। फोटो R2 में और विवरण D1 में सेव होंगे।</p>`;
     const form=body.closest('.dialog-card');
     const close=()=>dialog.close();
@@ -49,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const upload=new FormData();
       ['name','category','source','supplier_product_id','sku','selling_price','purchase_cost','stock','description','colors','sizes'].forEach(k=>upload.append(k,fd.get(k)||''));
       photos.forEach(f=>upload.append('images',f));
-      const key=String(fd.get('admin_key')||'');
+      const key=String(fd.get('admin_key')||adminKey||'');adminKey=key;
       const endpoint=product?`${API}/api/admin/products/${encodeURIComponent(product.id)}`:`${API}/api/admin/products`;
       const method=product?'PUT':'POST';
       saveBtn.disabled=true;saveBtn.textContent='Saving...';
@@ -65,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
   rows.addEventListener('click',async e=>{
     const edit=e.target.closest('[data-edit]'),del=e.target.closest('[data-delete]');
     if(edit){const p=cache.find(x=>String(x.id)===edit.dataset.edit);if(p)openForm(p)}
-    if(del){const key=prompt('Admin API Key डालें (Cloudflare ADMIN_API_KEY की value):');if(!key)return;
+    if(del){const key=adminKey||String(prompt('Admin API Key डालें (Cloudflare ADMIN_API_KEY की value):')||'');if(!key)return;adminKey=key;
       if(!confirm('क्या आप यह प्रोडक्ट हटाना चाहते हैं?'))return;
       try{const r=await fetch(`${API}/api/admin/products/${encodeURIComponent(del.dataset.delete)}`,{method:'DELETE',headers:{Authorization:`Bearer ${key}`}});const d=await r.json();if(!r.ok||!d.ok)throw Error(d.error||'Delete नहीं हुआ');AdminUI.showToast('प्रोडक्ट हट गया');loadProducts()}catch(e){AdminUI.showToast(e.message)}
     }
