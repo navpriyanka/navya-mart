@@ -1,4 +1,4 @@
-/* NAVYA MART Admin UI - frontend preview only. Connect authenticated Worker API before production. */
+/* NAVYA MART Admin UI. Backend health is checked against the live Worker. */
 (() => {
   const $ = (s, root=document) => root.querySelector(s);
   const $$ = (s, root=document) => [...root.querySelectorAll(s)];
@@ -37,6 +37,12 @@
     $('#menuBtn').addEventListener('click',()=>$('#sidebar').classList.toggle('open'));
     $('#todayDate').textContent=new Intl.DateTimeFormat('en-IN',{day:'2-digit',month:'short',year:'numeric'}).format(new Date());
     $('#year').textContent=new Date().getFullYear();
-    $('#saveSettingsBtn').addEventListener('click',()=>AdminUI.showToast('Preview में सेटिंग दिख रही हैं; स्थायी सेव के लिए D1 API जोड़ना बाकी है।'));
+    const backendStatus=$('#backendStatus');
+    if(backendStatus){
+      fetch('https://navya-mart-api.psahu154.workers.dev/api/health')
+        .then(async response=>{const data=await response.json();if(!response.ok||!data.ok||data.database!=='connected')throw new Error('unavailable');backendStatus.innerHTML='<span class="status-dot" style="background:#35c779"></span> Backend connected';})
+        .catch(()=>{backendStatus.innerHTML='<span class="status-dot" style="background:#e5a33b"></span> Backend unavailable';});
+    }
+    $('#saveSettingsBtn').addEventListener('click',()=>AdminUI.showToast('Website Settings का स्थायी D1 save अभी उपलब्ध नहीं है।'));
   });
 })();
